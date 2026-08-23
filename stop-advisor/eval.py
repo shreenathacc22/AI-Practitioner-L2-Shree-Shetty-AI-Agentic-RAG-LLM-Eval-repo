@@ -241,7 +241,7 @@ def cmd_grounding(args, cases=None) -> tuple[int, int]:
                     forbidden=f"FORBIDDEN: {'; '.join(e['forbidden'])}\n" if e["forbidden"] else "",
                     facts=" | ".join(e["facts"]) or "(none)",
                     q=c["question"], ans=out)}],
-                    label="judge", max_tokens=600, response_format={"type": "json_object"})
+                    label="judge", max_tokens=1200, response_format={"type": "json_object"})
                 try:
                     v = json.loads(raw.strip().removeprefix("```json")
                                    .removeprefix("```").removesuffix("```").strip())

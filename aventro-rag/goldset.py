@@ -234,7 +234,7 @@ def cmd_mine(args) -> None:
 
             # GATE 1 — stapled conjunction? cheapest check, no document text needed.
             c = parse_json(chat(cli, [{"role": "user", "content": CONJUNCTION_PROMPT.format(q=q)}],
-                label="conjunction", max_tokens=200, response_format={"type": "json_object"}))
+                label="conjunction", max_tokens=500, response_format={"type": "json_object"}))
             if c.get("stapled") is True:
                 rejected += 1
                 say(f"  [dim]rejected (stapled conjunction): {q[:70]}[/dim]")
@@ -245,7 +245,7 @@ def cmd_mine(args) -> None:
             for doc in (a, b):
                 v = parse_json(chat(cli, [{"role": "user", "content": VERIFY_PROMPT.format(
                     q=q, doc=doc, text=docs[doc][:6000])}],
-                    label="verify", max_tokens=200, response_format={"type": "json_object"}))
+                    label="verify", max_tokens=500, response_format={"type": "json_object"}))
                 if v.get("answerable_alone") is True:
                     alone = True
                     break

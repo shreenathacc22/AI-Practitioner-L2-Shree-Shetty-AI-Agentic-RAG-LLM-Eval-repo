@@ -168,7 +168,7 @@ def synthesize(cli, ticker: str, a: dict, hits: list[dict]) -> str:
             {"role": "system", "content": SYSTEM + "\n\n" + ctx},
             {"role": "user", "content":
                 f"Ticker {ticker}, stated entry {a['entry']:.2f}. Give the stop-candidate briefing."},
-        ], label="synthesize", max_tokens=700)
+        ], label="synthesize", max_tokens=1400)
 
 
 def ask(cli, ticker: str, a: dict, hits: list[dict], question: str) -> str:
@@ -182,7 +182,7 @@ def ask(cli, ticker: str, a: dict, hits: list[dict], question: str) -> str:
               articles=[h["article"] for h in hits]):
         return chat(cli, [{"role": "system", "content": ASK_SYSTEM + "\n\n" + ctx},
                           {"role": "user", "content": question}],
-                    label="ask", max_tokens=600)
+                    label="ask", max_tokens=1200)
 
 
 # ── the pipeline ────────────────────────────────────────────────────────────
@@ -268,6 +268,13 @@ def render(r: dict) -> None:
     if r["briefing"]:
         say(f"\n[bold]── synthesis ──────────────────────────────────────────────[/bold]\n")
         say(r["briefing"])
+    elif r["briefing"] == "":
+        # Belt and braces behind kit.chat's retry. An empty briefing must announce
+        # itself; the maths above is still valid and the user needs to know which
+        # half they are missing rather than wondering where the prose went.
+        say("\n[yellow]synthesis returned nothing[/yellow] — the model produced no visible "
+            "output even after retrying with a larger token budget. The measured numbers "
+            "and candidates above are unaffected; only the narrative summary is missing.")
 
     say(f"\n[red bold]DISCLAIMER[/red bold] [dim]{DISCLAIMER}[/dim]\n")
 

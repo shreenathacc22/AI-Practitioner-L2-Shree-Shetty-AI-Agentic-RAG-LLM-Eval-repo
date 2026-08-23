@@ -92,16 +92,44 @@ meter = Meter()
 
 
 def chat(cli: OpenAI, messages: list[dict], label: str = "chat", **kw) -> str:
-    """One metered chat call. Waits out a burst-limit 429 twice — eval suites are bursty."""
+    """One metered chat call, with the two failure modes this proxy actually exhibits
+    handled here rather than at seven call sites.
+
+    429 burst limit — the classroom lane is shared and eval suites are bursty. Wait it out.
+
+    EMPTY COMPLETION WITH finish_reason='length' — the interesting one, and it cost this
+    project real debugging. The proxy fronts a reasoning model: it can spend the ENTIRE
+    visible token budget on hidden reasoning and return content of length zero, having
+    billed the full max_tokens. Measured here at roughly one call in three for the
+    briefing prompt at max_tokens=700.
+
+    The damage is that it fails SILENTLY and plausibly. `""` is falsy, so the briefing
+    simply vanished from the output while the meter cheerfully reported a successful
+    call, and in eval.py the same empty string arrived at json.loads and surfaced as
+    "judge returned no JSON" — a symptom three layers away from its cause.
+
+    So an empty answer that was truncated is treated as a retryable failure, not an
+    answer, and the budget is doubled on each retry. Returning "" to the caller is
+    exactly the silent degradation this whole project refuses to do everywhere else.
+    """
+    budget = kw.get("max_tokens")
+    resp = None
     for attempt in (1, 2, 3):
         try:
             resp = cli.chat.completions.create(model=MODEL, messages=messages, **kw)
-            break
         except Exception as e:  # noqa: BLE001
             if attempt < 3 and "429" in str(e):
                 say("[dim](burst limit — waiting 25s, shared classroom lane)[/dim]")
                 time.sleep(25)
                 continue
             raise
-    meter.add(resp.usage, label)
-    return (resp.choices[0].message.content or "").strip()
+        meter.add(resp.usage, label)          # every attempt is billed, so every attempt counts
+        choice = resp.choices[0]
+        content = (choice.message.content or "").strip()
+        if content or choice.finish_reason != "length" or not budget or attempt == 3:
+            return content
+        budget *= 2
+        kw["max_tokens"] = budget
+        say(f"[dim](empty completion: the visible budget went to hidden reasoning — "
+            f"retrying at max_tokens={budget})[/dim]")
+    return ""

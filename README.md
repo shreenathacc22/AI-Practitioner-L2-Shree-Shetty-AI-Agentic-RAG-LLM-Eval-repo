@@ -7,7 +7,7 @@ number on a scorecard rather than a feeling.
 | project | what it is | status |
 |---|---|---|
 | [`aventro-rag/`](aventro-rag/) | RAG over a 50-document corpus + a LangGraph agent + LLM-as-judge evaluation | complete, **12/12** on the golden set |
-| [`stop-advisor/`](stop-advisor/) | stop-loss / exit-point decision support: market data + news RAG | 🚧 work in progress |
+| [`stop-advisor/`](stop-advisor/) | stop-loss / exit-point decision support: market data + news RAG | complete, **8/8** numeric + **4/4** grounding |
 
 ---
 
@@ -60,6 +60,16 @@ It paid for itself before producing a score:
    reference answer asserting a fact the source never states (failing *correct*
    answers), doc-level blame misreporting retrieval misses as generation, and a
    judge whose unparseable output silently became `FAIL`.
+5. **A silent empty-completion defect in the proxy layer.** The class proxy fronts a
+   *reasoning* model, which spends tokens thinking before writing. On a hard prompt
+   it can burn the whole budget reasoning and return `content=''` with
+   `finish_reason='length'` — every token billed, nothing returned. Measured: at
+   `max_tokens=300` over a long retrieved context, **5 of 5 calls came back empty**.
+   The failure lies in both directions — `''` is falsy so an answer just vanishes,
+   and `json.loads('')` raises, which reads upstream as "the judge returned
+   malformed JSON", sending you to debug a judge that was never asked a question.
+   Fixed centrally in `kit.chat`: empty-plus-`length` is retryable, doubling the
+   budget to a ceiling. Recovery verified 3/3 on the prompt that failed 5/5.
 
 ### Observability
 
@@ -82,7 +92,7 @@ destructive actions pause for a human — failing **closed** when non-interactiv
 
 ---
 
-## `stop-advisor/` — 🚧 work in progress
+## `stop-advisor/` — decision support, not prediction
 
 Stop-loss / exit-point **decision support**: a market-data feed supplies the
 numbers (ATR, realised volatility, swing lows), web search supplies the narrative
@@ -96,6 +106,17 @@ with citations.
 > "will this go up?" are an explicit refusal test case.
 
 Runs in **fixture mode** with no API keys, so the pipeline is verifiable offline.
+Evaluation separates **deterministic** maths (8/8 — ATR hand-checked against exact
+rationals: the `TESTCO` fixture is built so its true ranges are exactly 1…14, 30,
+making Wilder ATR(14) exactly `255/28`) from **LLM-judged grounding** (4/4).
+
+The market-data layer targets **massive.com, which is Polygon.io rebranded** —
+`MASSIVE_API_KEY` against `api.massive.com/v2/aggs/...`. The endpoint is verified
+real (it returns `"API Key was not provided"` bare and `"Unknown API Key"` with a
+credential), but **the 200 path has never executed** — no key was available. Treat
+the first live run as a test. `MassiveSource` deliberately does **not** fall back to
+fixtures: a stop computed from sample data while you believe you are live is the
+worst possible output.
 
 ---
 

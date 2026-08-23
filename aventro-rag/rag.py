@@ -352,7 +352,7 @@ def _answer_call(cli, query: str, ctx: str, label: str) -> str:
             "Never invent items to complete a list.\n"
             "Do not use outside knowledge.\n\n" + ctx},
         {"role": "user", "content": query},
-    ], label=label, max_tokens=350)
+    ], label=label, max_tokens=800)
 
 
 # ── cli ─────────────────────────────────────────────────────────────────────

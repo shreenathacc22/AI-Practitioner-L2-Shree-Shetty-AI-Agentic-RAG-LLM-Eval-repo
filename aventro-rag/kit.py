@@ -67,17 +67,45 @@ class Meter:
 meter = Meter()
 
 
+MAX_BUDGET = 4000        # ceiling for the auto-retry below
+
+
 def chat(cli: OpenAI, messages: list[dict], label: str = "chat", **kw) -> str:
-    """One metered chat call. Waits out a burst-limit 429 once — eval suites are bursty."""
-    for attempt in (1, 2, 3):
+    """One metered chat call, hardened against two failure modes of this proxy.
+
+    429 burst limit — waited out; eval suites are bursty by nature.
+
+    EMPTY COMPLETION — the proxy fronts a REASONING model, which spends tokens
+    thinking before it writes. On a hard prompt it can burn the entire budget on
+    reasoning and return content='' with finish_reason='length', having billed
+    every token. Measured here: at max_tokens=300 over a long retrieved context,
+    5 of 5 calls came back empty.
+
+    That failure is silent and it lies in both directions. '' is falsy, so an
+    answer simply vanishes; and json.loads('') raises, which upstream reads as
+    "the judge returned malformed JSON" — sending you to debug a judge that was
+    never asked a question. So: detect it, and retry with a bigger budget rather
+    than passing '' up the stack as if it were an answer."""
+    budget = kw.get("max_tokens")
+    for attempt in (1, 2, 3, 4):
         try:
             resp = cli.chat.completions.create(model=MODEL, messages=messages, **kw)
-            break
         except Exception as e:  # noqa: BLE001
-            if attempt < 3 and "429" in str(e):
+            if attempt < 4 and "429" in str(e):
                 say("[dim](burst limit — waiting 25s, shared classroom lane)[/dim]")
                 time.sleep(25)
                 continue
             raise
-    meter.add(resp.usage, label)
-    return (resp.choices[0].message.content or "").strip()
+        meter.add(resp.usage, label)          # bill it: the tokens were spent either way
+        choice = resp.choices[0]
+        content = (choice.message.content or "").strip()
+        if content or choice.finish_reason != "length" or budget is None or budget >= MAX_BUDGET:
+            if not content and choice.finish_reason == "length":
+                say(f"[yellow](empty completion at max_tokens={budget}; at the "
+                    f"{MAX_BUDGET} ceiling — returning empty rather than guessing)[/yellow]")
+            return content
+        budget = min(budget * 2, MAX_BUDGET)
+        kw["max_tokens"] = budget
+        say(f"[dim](reasoning consumed the whole budget — retrying at "
+            f"max_tokens={budget})[/dim]")
+    return content
