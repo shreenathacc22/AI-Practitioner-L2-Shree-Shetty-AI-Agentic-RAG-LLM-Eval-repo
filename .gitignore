@@ -1,0 +1,17 @@
+# secrets — never commit
+.env
+.env.local
+
+# environments and build artifacts
+.venv/
+__pycache__/
+*.pyc
+
+# vector index (rebuild with: python rag.py build)
+chroma/
+
+# runtime traces and logs (regenerated on every run)
+*_traces.jsonl
+*.log
+
+.DS_Store

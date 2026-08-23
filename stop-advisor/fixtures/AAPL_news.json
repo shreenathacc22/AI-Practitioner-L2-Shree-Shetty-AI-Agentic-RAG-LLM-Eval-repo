@@ -1,0 +1,70 @@
+{
+ "ticker": "AAPL",
+ "note": "SYNTHETIC DEMO FIXTURE — none of these articles are real. They were written for this repo so the offline pipeline has a narrative layer to retrieve over. Outlets are fictional and every URL points at the reserved-for-testing 'example.invalid' domain, which cannot resolve. Do not quote any of it as fact about Apple Inc.",
+ "articles": [
+  {
+   "id": "N1",
+   "title": "FIXTURE: Apple sets fiscal Q4 earnings call for 30 October",
+   "url": "https://newswire.example.invalid/fixture/aapl-q4-date",
+   "published": "2026-08-19",
+   "provenance": "FIXTURE (synthetic)",
+   "content": "Apple confirmed it will report fiscal fourth-quarter results after the close on 30 October 2026, with a conference call to follow at 2pm Pacific. The date lands inside the holding period of anyone entering now. Earnings releases are the single most common source of overnight gap risk in large-cap equities: the stock does not trade between the close and the release, so a stop-loss order resting below the market cannot be filled at its trigger price if the shares reopen far below it. Options desks quoted a roughly 4.5% implied move for the session following the print, against a trailing average absolute move of about 3.1% across the last eight reports."
+  },
+  {
+   "id": "N2",
+   "title": "FIXTURE: Key display supplier trims second-half outlook, flags panel oversupply",
+   "url": "https://tradepress.example.invalid/fixture/panel-oversupply",
+   "published": "2026-08-18",
+   "provenance": "FIXTURE (synthetic)",
+   "content": "A major display supplier cut its second-half revenue guidance by 6 to 8 percent, citing panel oversupply and softer orders from its largest North American customer. Analysts read the commentary as a negative read-through for unit expectations. Two brokerages trimmed their own hardware revenue estimates within twenty-four hours, though neither changed its rating. Supply-chain guidance changes of this kind tend to produce a repricing over several sessions rather than a single gap, which makes them a volatility event rather than a jump event."
+  },
+  {
+   "id": "N3",
+   "title": "FIXTURE: EU regulator opens second review of App Store compliance terms",
+   "url": "https://regwatch.example.invalid/fixture/eu-second-review",
+   "published": "2026-08-14",
+   "provenance": "FIXTURE (synthetic)",
+   "content": "European regulators opened a second compliance review of App Store business terms, with a preliminary finding expected before the end of the calendar year. Penalties under the framework can reach a percentage of global turnover. Legal and regulatory timelines are unpredictable in timing but usually well telegraphed in direction, and headlines can arrive on any day of the week without warning. Litigation and regulatory headlines are a well-known source of intraday spikes in realised volatility even where the eventual financial impact proves immaterial."
+  },
+  {
+   "id": "N4",
+   "title": "FIXTURE: Semiconductor complex sells off 4% on memory pricing scare",
+   "url": "https://marketdesk.example.invalid/fixture/semi-selloff",
+   "published": "2026-08-20",
+   "provenance": "FIXTURE (synthetic)",
+   "content": "The semiconductor sector fell more than four percent after a memory maker warned on pricing, dragging the broader hardware complex lower with it. Large-cap consumer hardware names traded down in sympathy despite limited direct exposure to memory pricing. Correlated sector drawdowns matter for stop placement because they move many positions at once: a stop sized for single-name noise can be triggered by a sector-wide move that has nothing to do with the company. Realised volatility across the group rose sharply over the five sessions to 20 August."
+  },
+  {
+   "id": "N5",
+   "title": "FIXTURE: One-month implied volatility pushes to the top of its six-month range",
+   "url": "https://optionsdaily.example.invalid/fixture/iv-rank",
+   "published": "2026-08-21",
+   "provenance": "FIXTURE (synthetic)",
+   "content": "One-month at-the-money implied volatility rose to roughly 31 percent, near the top of its six-month range and above trailing realised volatility of about 26 percent. When implied sits above realised the options market is pricing more future movement than has recently occurred, typically because a scheduled catalyst sits inside the window. Traders sizing stops from trailing realised volatility alone should be aware that the market's forward estimate is currently wider than the backward-looking measure."
+  },
+  {
+   "id": "N6",
+   "title": "FIXTURE: Autumn accessory line adds two colourways",
+   "url": "https://gadgetblog.example.invalid/fixture/autumn-colours",
+   "published": "2026-08-17",
+   "provenance": "FIXTURE (synthetic)",
+   "content": "Two new colourways joined the autumn accessory line-up this week, alongside a minor firmware update for the wearables range. Reaction was positive on social channels. Accessory refreshes are not typically material to quarterly revenue and analysts did not adjust estimates. Retail availability begins in the first week of September across most regions."
+  },
+  {
+   "id": "N7",
+   "title": "FIXTURE: Broker raises target to 265, keeps Buy",
+   "url": "https://analystwire.example.invalid/fixture/target-265",
+   "published": "2026-08-15",
+   "provenance": "FIXTURE (synthetic)",
+   "content": "A brokerage raised its twelve-month price target to 265 dollars from 248 while maintaining a Buy rating, citing services margin expansion. The note acknowledged that the target assumes multiple expansion and does not account for regulatory outcomes. Price targets are analyst opinions about value on a twelve-month horizon; they are not forecasts of the path a price takes, and they carry no information about drawdown risk along the way."
+  },
+  {
+   "id": "N8",
+   "title": "FIXTURE: Board declares quarterly dividend, ex-date 8 September",
+   "url": "https://corpfilings.example.invalid/fixture/dividend-sep",
+   "published": "2026-08-12",
+   "provenance": "FIXTURE (synthetic)",
+   "content": "The board declared a quarterly cash dividend payable in mid-September, with an ex-dividend date of 8 September. Shares typically open lower by approximately the dividend amount on the ex-date, a mechanical adjustment rather than a market move. Holders of stop orders should note that this mechanical drop is not distinguishable from a real decline by a resting stop order, though at current yields the adjustment is small relative to a single average daily range."
+  }
+ ]
+}
